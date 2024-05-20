@@ -1,6 +1,6 @@
 {
   "name": "seo-analyzer-123",
-  "version": "4.0.4",
+  "version": "4.0.5",
   "description": "A library for analyze a HTML files to show all of the SEO defects",
   "license": "MIT",
   "repository": "https://github.com/maddevsio/seo-analyzer",
@@ -75,7 +75,6 @@
     "@semantic-release/github": "10.0.2",
     "@semantic-release/npm": "^12.0.0",
     "@semantic-release/release-notes-generator": "13.0.0",
-    "@types/cli-progress": "^3.11.5",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.12",
     "@types/jsdom": "^21.1.6",
@@ -91,6 +90,7 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
+    "@types/cli-progress": "^3.11.5",
     "axios": "^1.6.8",
     "cfonts": "^3.2.0",
     "cli-progress": "^3.12.0",
