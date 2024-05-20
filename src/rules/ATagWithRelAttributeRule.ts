@@ -1,20 +1,25 @@
-import { JSDOM } from 'jsdom';
+import type { JSDOM } from 'jsdom';
+import { cssPath } from '.';
+import type { IReport, TRuleFunc } from '../interfaces';
 
-function ATagWithRelAttributeRule(dom: JSDOM): Promise<string[] | []> {
+const ATagWithRelAttributeRule: TRuleFunc = (
+  dom: JSDOM
+): Promise<IReport[] | []> => {
   return new Promise(resolve => {
-    let count = 0;
-    const report: string[] = [];
+    const report: IReport[] = [];
     const elements = dom.window.document.querySelectorAll('a');
-    elements.forEach((element: HTMLAnchorElement) => {
+    for (const element of elements) {
       if (!element.rel) {
-        count++;
+        report.push({
+          errorMessage: 'This <a> tags is missing a rel attribute',
+          rule: 'tagMissingRelAttribute',
+          failingValue: '',
+          htmlCssSelector: cssPath(element)
+        });
       }
-    });
-    if (count > 0) {
-      report.push(`There are ${count} <a> tags without a rel attribute`);
     }
     resolve(report);
   });
-}
+};
 
 export default ATagWithRelAttributeRule;

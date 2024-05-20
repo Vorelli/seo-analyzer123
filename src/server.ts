@@ -1,5 +1,5 @@
 import express from 'express';
-import path from 'path';
+import path from 'node:path';
 import Logger from './modules/logger';
 
 const app = express();

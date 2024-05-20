@@ -1,8 +1,10 @@
-import cliProgress, { SingleBar } from 'cli-progress';
+import cliProgress, { type SingleBar } from 'cli-progress';
 import _colors from 'colors';
-import { JSDOM } from 'jsdom';
-import { IInputData, IRule } from '../interfaces';
+import type { JSDOM } from 'jsdom';
+import type { IInputData, IReport, IResult, IRule } from '../interfaces';
 
+import { inspect } from 'node:util';
+import { isNativeError } from 'node:util/types';
 import Logger from './logger';
 
 const BAD_TYPE_MESSAGE =
@@ -21,10 +23,7 @@ class Analyzer {
   constructor(logger: Logger) {
     this.logger = logger ?? new Logger();
     this.consoleProgressBar = new cliProgress.Bar({
-      format:
-        'Running rules |' +
-        _colors.green('{bar}') +
-        '| {percentage}% || {value}/{total} Rules',
+      format: `Running rules |${_colors.green('{bar}')}| {percentage}% || {value}/{total} Rules`,
       barCompleteChar: '\u2588',
       barIncompleteChar: '\u2591',
       hideCursor: true
@@ -34,10 +33,13 @@ class Analyzer {
   /**
    * @param {Array} inputData - html doms
    * @param {Array} rules - List rulers
-   * @returns {AnalyzerResult} - Array of reports [{source, report}, {source, report}, {source, report}]
+   * @returns {IResult[]} - Array of reports [{source, report}, {source, report}, {source, report}]
    */
-  private async startAnalyzer(inputData: IInputData[], rules: IRule[]) {
-    const result = [];
+  private async startAnalyzer(
+    inputData: IInputData[],
+    rules: IRule[]
+  ): Promise<IResult[]> {
+    const result: IResult[] = [];
     for (const item of inputData) {
       this.logger.info(
         `\n${_colors.blue('==>')} Analysis ${_colors.white(item.source)}`
@@ -45,7 +47,7 @@ class Analyzer {
 
       const report = await this.analyzeDOM(item.dom, rules);
 
-      if (report && report.length) {
+      if (report?.length) {
         result.push({
           source: item.source,
           report
@@ -62,20 +64,25 @@ class Analyzer {
    * @param {*} rules - The rules to run
    * @returns {Array<string>} - Array of error result ['error', 'error', 'error']
    */
-  private async analyzeDOM(dom: JSDOM, rules: IRule[]) {
-    const result = [];
+  private async analyzeDOM(
+    dom: JSDOM,
+    rules: IRule[]
+  ): Promise<Array<IReport>> {
+    const result: IReport[] = [];
     // Start the progress bar
     this.logger.level <= 4 && this.consoleProgressBar.start(rules.length, 0);
 
     for (const item of rules) {
-      let report = null;
+      let report: IReport[] | null = null;
       try {
         report = await item.rule(dom, item.options);
       } catch (error) {
-        report = error;
+        this.logger.error(
+          isNativeError(error) ? error.message : inspect(error)
+        );
       }
       if (Array.isArray(report)) {
-        result.push(...report);
+        result.splice(report.length, 0, ...report);
       } else {
         if (report) {
           result.push(report);
@@ -97,7 +104,7 @@ class Analyzer {
    * @param {Array} rules - The rules to run
    * @returns {AnalyzerResult} - Array of error result [{ source, report }, { source, report }, { source, report }]
    */
-  async run(inputData: IInputData[], rules: IRule[]) {
+  async run(inputData: IInputData[], rules: IRule[]): Promise<IResult[]> {
     if (inputData.length === 0) {
       this.logger.error(EMPTY_LIST_MESSAGE);
     }

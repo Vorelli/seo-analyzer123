@@ -1,9 +1,9 @@
 import axios from 'axios';
-import sitemaps from 'sitemap-stream-parser';
-import cliProgress, { SingleBar } from 'cli-progress';
+import cliProgress, { type SingleBar } from 'cli-progress';
 import _colors from 'colors';
+import sitemaps from 'sitemap-stream-parser';
+import type { IInputHtml } from '../interfaces';
 import Logger from './logger';
-import { IInputHtml } from '../interfaces';
 
 class Scanner {
   logger: Logger;
@@ -13,10 +13,7 @@ class Scanner {
   constructor(logger: Logger) {
     this.logger = logger ?? new Logger();
     this.consoleProgressBar = new cliProgress.Bar({
-      format:
-        'Processing... |' +
-        _colors.green('{bar}') +
-        '| {percentage}% || {value}/{total} Pages',
+      format: `Processing... |${_colors.green('{bar}')}| {percentage}% || {value}/{total} Pages`,
       barCompleteChar: '\u2588',
       barIncompleteChar: '\u2591',
       hideCursor: true
@@ -30,7 +27,7 @@ class Scanner {
    * @returns {Array} - Array of html doms
    * @description - Scrapes the site and returns the html doms
    */
-  async run(port: Number, urls: string[], sitemap: string) {
+  async run(port: number, urls: string[], sitemap: string) {
     this.inputUrl = `http://localhost:${port}`;
     this.ignoreUrls = urls;
     const links = await this.getLinksFromSitemap(sitemap);
@@ -67,6 +64,7 @@ class Scanner {
             links.push(this.formatLink(link));
           }
         },
+        //biome-ignore lint: blah
         (err: any) => {
           if (err) {
             this.logger.error('❌  Sitemap not found\n', true);
@@ -126,13 +124,10 @@ class Scanner {
             }
           })
           .catch(error => {
-            const err =
-              (error && error.response && error.response.status) || 500;
+            const err = error?.response?.status || 500;
             this.logger.error(`\n\n${error} - ${link}`);
             this.logger.error(
-              `\n${_colors.yellow('==>')} ${_colors.white(link)} ${_colors.red(
-                err
-              )}`
+              `\n${_colors.yellow('==>')} ${_colors.white(link)} ${_colors.red(err)}`
             );
           })
           .finally(() => {

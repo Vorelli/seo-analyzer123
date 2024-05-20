@@ -114,3 +114,6 @@ dist
 .yarn/build-state.yml
 .pnp.*
 .nyc_output
+
+package-lock.json
+bun.lockb

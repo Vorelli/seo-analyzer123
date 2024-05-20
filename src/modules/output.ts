@@ -1,6 +1,6 @@
+import type { IInputData, IResult, IRule } from '../interfaces';
 import Analyzer from './analyzer';
-import { IRule, IResult, IInputData } from '../interfaces';
-import Logger from './logger';
+import type Logger from './logger';
 
 class Output {
   analyzer: Analyzer;

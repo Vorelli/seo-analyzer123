@@ -1,28 +1,35 @@
-import { JSDOM } from 'jsdom';
+import type { JSDOM } from 'jsdom';
+import { cssPath } from '.';
+import type { IReport, TRuleFunc } from '../interfaces';
 
-function headingsStructureRule(dom: JSDOM): Promise<string[] | []> {
+const headingsStructureRule: TRuleFunc = (
+  dom: JSDOM
+): Promise<IReport[] | []> => {
   return new Promise(resolve => {
     const headings = dom.window.document.querySelectorAll(
       'h1, h2, h3, h4, h5, h6'
     );
-    const report: string[] = [];
+    const report: IReport[] = [];
     let previousLevel = 0;
     if (headings.length) {
-      headings.forEach((heading: Element) => {
-        const level = parseInt(heading.tagName.substring(1), 10);
+      for (const heading of headings) {
+        const level = Number.parseInt(heading.tagName.substring(1), 10);
         if (level < previousLevel) {
-          report.push(
-            `Incorrect headings structure: ${heading.tagName} follows ${
-              previousLevel ? 'H' + previousLevel : 'no heading'
-            }.`
-          );
+          report.push({
+            errorMessage: `Incorrect headings structure: ${heading.tagName} follows ${
+              previousLevel ? `H${previousLevel}` : 'no heading'
+            }.`,
+            failingValue: heading.tagName,
+            rule: 'incorrect-headings-structure',
+            htmlCssSelector: cssPath(heading)
+          });
         }
         previousLevel = level;
-      });
+      }
     }
 
     resolve(report);
   });
-}
+};
 
 export default headingsStructureRule;

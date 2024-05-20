@@ -1,14 +1,15 @@
-import defaultRules from './rules/index';
-import {
-  ISeoAnalyzerOptions,
-  IRule,
+import type {
   IInputData,
   IInputHtml,
+  IResult,
+  IRule,
+  ISeoAnalyzerOptions,
   TRuleFunc
 } from './interfaces';
 import Input from './modules/input';
-import Output from './modules/output';
 import Logger from './modules/logger';
+import Output from './modules/output';
+import defaultRules from './rules/index';
 
 import { startServer } from './server';
 
@@ -32,7 +33,7 @@ class SeoAnalyzer {
   ignoreFoldersList: string[];
   ignoreFilesList: string[];
   ignoreUrlsList: string[];
-  operations: Function[];
+  operations: (() => Promise<void>)[];
   constructor(options: ISeoAnalyzerOptions = { verbose: true }) {
     this.options = options;
     this.logger = new Logger(options?.verbose ? 'default' : 'error');
@@ -45,7 +46,6 @@ class SeoAnalyzer {
     this.ignoreFilesList = [];
     this.ignoreUrlsList = [];
     this.operations = [];
-    return this;
   }
 
   // --------- Ignore methods --------- //
@@ -122,7 +122,6 @@ class SeoAnalyzer {
       startServer(folder, port);
       const result = await this.input.spa(port, this.ignoreUrlsList, sitemap);
       this.inputDataList = [...this.inputDataList, ...result];
-      return this;
     });
     return this;
   }
@@ -231,7 +230,7 @@ class SeoAnalyzer {
    * @param {function(string): void}
    * @returns {SeoAnalyzer}
    */
-  public outputJson(callback: Function) {
+  public outputJson(callback: (json: string) => void) {
     this.operations.push(async () => {
       const json = await this.output.json(this.inputDataList, this.rules);
       callback(json);
@@ -244,7 +243,7 @@ class SeoAnalyzer {
    * @param {function(AnalyzerResult): void}
    * @returns {SeoAnalyzer}
    */
-  public outputObject(callback: Function) {
+  public outputObject(callback: (obj: IResult[]) => void) {
     this.operations.push(async () => {
       const obj = await this.output.object(this.inputDataList, this.rules);
       callback(obj);

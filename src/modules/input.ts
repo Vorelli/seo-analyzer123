@@ -1,11 +1,11 @@
-import fs from 'fs';
-import path from 'path';
-import { JSDOM, VirtualConsole } from 'jsdom';
-import cliProgress, { SingleBar } from 'cli-progress';
+import fs from 'node:fs';
+import path from 'node:path';
+import cliProgress, { type SingleBar } from 'cli-progress';
 import _colors from 'colors';
+import { JSDOM, VirtualConsole } from 'jsdom';
+import type { IInputData, IInputHtml } from '../interfaces';
 import Logger from './logger';
 import Scraper from './scraper';
-import { IInputData, IInputHtml } from '../interfaces';
 
 /**
  * @typedef {Array<JSDOM>} ListDom
@@ -26,10 +26,7 @@ class Input {
     this.logger = logger ?? new Logger();
     this.scraper = new Scraper(this.logger);
     this.consoleProgressBar = new cliProgress.Bar({
-      format:
-        'Processing... |' +
-        _colors.green('{bar}') +
-        '| {percentage}% || {value}/{total} Folders',
+      format: `Processing... |${_colors.green('{bar}')}| {percentage}% || {value}/{total} Folders`,
       barCompleteChar: '\u2588',
       barIncompleteChar: '\u2591',
       hideCursor: true
@@ -66,9 +63,8 @@ class Input {
       this.logger.error(BAD_TYPE_MESSAGE);
     }
     this.ignoreFiles = ignoreFiles;
-    const listTexts = await this.getHtml(files);
-    const listDOM = await this.getDom(listTexts);
-    return listDOM;
+    const listTexts = this.getHtml(files);
+    return listTexts ? this.getDom(listTexts) : [];
   }
 
   /**
@@ -114,7 +110,7 @@ class Input {
    * @param ignoreUrls
    * @returns {Promise<ListDom>} [{ window: {}, document: {}, ... }, { window: {}, document: {}, ... }, ...]
    */
-  public async spa(port: Number, ignoreUrls: string[] = [], sitemap: string) {
+  public async spa(port: number, ignoreUrls: string[] = [], sitemap = '') {
     const listTexts = await this.scraper.run(port, ignoreUrls, sitemap);
     const htmlDoms = await this.getDom(listTexts);
     return htmlDoms;
@@ -166,7 +162,7 @@ class Input {
    * @private
    * @memberof Input
    */
-  private getFilesFromFolder(folder: string = ''): string[] {
+  private getFilesFromFolder(folder = ''): string[] {
     try {
       const entryPaths = fs
         .readdirSync(folder)
@@ -206,7 +202,7 @@ class Input {
     // Start the progress bar
     this.logger.level <= 4 && this.consoleProgressBar.start(files.length, 0);
 
-    files.forEach(file => {
+    for (const file of files) {
       if (this.ignoreFiles.includes(file)) return;
       try {
         const text = fs.readFileSync(file, 'utf8');
@@ -216,7 +212,7 @@ class Input {
         this.logger.level <= 4 && this.consoleProgressBar.increment();
         this.logger.error(`\n\nFile "${file}" not found\n`);
       }
-    });
+    }
     this.logger.level <= 4 && this.consoleProgressBar.stop();
     if (!listTexts.length) this.logger.error('\n❌  No files found.\n', true);
     return listTexts;
@@ -231,10 +227,7 @@ class Input {
   public getDom(list: IInputHtml[]) {
     const doms: IInputData[] = [];
     const proccess = new cliProgress.Bar({
-      format:
-        'Handling html |' +
-        _colors.green('{bar}') +
-        '| {percentage}% || {value}/{total} Sources',
+      format: `Handling html |${_colors.green('{bar}')}| {percentage}% || {value}/{total} Sources`,
       barCompleteChar: '\u2588',
       barIncompleteChar: '\u2591',
       hideCursor: true
@@ -243,11 +236,11 @@ class Input {
     this.logger.level <= 4 && proccess.start(list.length, 0);
     // NOTE: https://github.com/jsdom/jsdom/issues/2177#issuecomment-379212964
     const virtualConsole = new VirtualConsole();
-    list.forEach(item => {
-      let dom = new JSDOM(item.text, { virtualConsole });
+    for (const item of list) {
+      const dom = new JSDOM(item.text, { virtualConsole });
       doms.push({ source: item.source, dom });
       this.logger.level <= 4 && proccess.increment();
-    });
+    }
 
     this.logger.level <= 4 && proccess.stop();
     return doms;

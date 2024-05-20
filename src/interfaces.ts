@@ -1,19 +1,27 @@
-import { JSDOM } from 'jsdom';
+import type { JSDOM } from 'jsdom';
 
 export interface ISeoAnalyzerOptions {
   verbose?: boolean;
 }
 
-export interface IResult {
-  source: string;
-  report: string[];
+export interface IReport {
+  errorMessage: string;
+  htmlCssSelector: string;
+  failingValue: string;
+  rule: string;
 }
 
-export type TRuleFunc = (dom: JSDOM, options?: any) => Promise<string[] | []>;
+export interface IResult {
+  source: string;
+  report: IReport[];
+}
+
+// biome-ignore lint: TODO: Setup mapping between functions and their options
+export type TRuleFunc = (dom: JSDOM, options?: any) => Promise<IReport[] | []>;
 
 export interface IRule {
   rule: TRuleFunc;
-  options?: any;
+  options?: { [key: string]: unknown };
 }
 
 export interface IInputData {

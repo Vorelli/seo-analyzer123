@@ -1,7 +1,7 @@
 import CFonts from 'cfonts';
 import _colors from 'colors';
-import { IResult } from '../interfaces';
 import { LOGGER_LEVELS, LOGGER_LEVEL_DEFAULT } from '../config';
+import type { IResult } from '../interfaces';
 
 class Logger {
   /**
