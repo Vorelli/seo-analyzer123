@@ -1,5 +1,5 @@
+import { finder } from '../finder';
 import type { JSDOM } from 'jsdom';
-import { cssPath } from '.';
 import type { IReport, TRuleFunc } from '../interfaces';
 import { TITLE_LENGTH_RULE } from './config/defaults';
 
@@ -27,7 +27,7 @@ const titleLengthRule: TRuleFunc = (
         report.push({
           rule,
           errorMessage: `<title> too short(${titleLength}). The minimum length should be ${min} characters.`,
-          htmlCssSelector: cssPath(titleElement),
+          htmlCssSelector: finder(dom, titleElement),
           failingValue: titleText ?? ''
         });
       }
@@ -36,7 +36,7 @@ const titleLengthRule: TRuleFunc = (
           rule,
           errorMessage: `<title> too long(${titleLength}). The maximum length should be ${max} characters.`,
           failingValue: titleText ?? '',
-          htmlCssSelector: cssPath(titleElement)
+          htmlCssSelector: finder(dom, titleElement)
         });
       }
     }

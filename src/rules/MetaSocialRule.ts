@@ -1,5 +1,5 @@
+import { finder } from '../finder';
 import type { JSDOM } from 'jsdom';
-import { cssPath } from '.';
 import type { IReport, TRuleFunc } from '../interfaces';
 import { META_SOCIAL_RULE } from './config/defaults';
 
@@ -20,14 +20,14 @@ const metaSocialRule: TRuleFunc = (
           rule,
           errorMessage: `This HTML is missing a <meta property="${property}"> tag`,
           failingValue: '',
-          htmlCssSelector: cssPath(dom.window.document.querySelector('head'))
+          htmlCssSelector: finder(dom, dom.window.document.head)
         });
       } else if (!element.content) {
         report.push({
           rule,
           errorMessage: `The content attribute for the <meta property="${property}" content=""> tag is empty`,
           failingValue: '',
-          htmlCssSelector: cssPath(element)
+          htmlCssSelector: finder(dom, element)
         });
       }
     }

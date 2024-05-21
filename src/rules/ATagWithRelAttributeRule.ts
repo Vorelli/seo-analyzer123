@@ -1,5 +1,5 @@
+import { finder } from '../finder';
 import type { JSDOM } from 'jsdom';
-import { cssPath } from '.';
 import type { IReport, TRuleFunc } from '../interfaces';
 
 const ATagWithRelAttributeRule: TRuleFunc = (
@@ -14,7 +14,7 @@ const ATagWithRelAttributeRule: TRuleFunc = (
           errorMessage: 'This <a> tags is missing a rel attribute',
           rule: 'tagMissingRelAttribute',
           failingValue: '',
-          htmlCssSelector: cssPath(element)
+          htmlCssSelector: finder(dom, element)
         });
       }
     }

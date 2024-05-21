@@ -1,5 +1,5 @@
+import { finder } from '../finder';
 import type { JSDOM } from 'jsdom';
-import { cssPath } from '.';
 import type { IReport, TRuleFunc } from '../interfaces';
 
 /**
@@ -19,7 +19,7 @@ const canonicalLinkRule: TRuleFunc = (dom: JSDOM): Promise<IReport[] | []> => {
         errorMessage:
           'This HTML is missing a <link rel="canonical" href="..."> link',
         failingValue: '',
-        htmlCssSelector: cssPath(dom.window.document.querySelector('head')),
+        htmlCssSelector: finder(dom, dom.window.document.head),
         rule: 'headTagMissingCanonicalLink'
       });
     } else {
@@ -27,15 +27,15 @@ const canonicalLinkRule: TRuleFunc = (dom: JSDOM): Promise<IReport[] | []> => {
         report.push({
           errorMessage: 'The canonical link is missing an href attribute',
           failingValue: '',
-          htmlCssSelector: cssPath(element),
+          htmlCssSelector: finder(dom, element),
           rule: 'canonicalLinkMissingHrefAttribute'
         });
-      } else if (element && element.href.substr(-1) !== '/') {
+      } else if (element && element.href[element.href.length - 1] !== '/') {
         report.push({
           errorMessage:
             'The href attribute does not have a slash at the end of the link.',
           failingValue: element.href,
-          htmlCssSelector: cssPath(element),
+          htmlCssSelector: finder(dom, element),
           rule: 'canonicalLinkHrefMissingTrailingSlash'
         });
       }

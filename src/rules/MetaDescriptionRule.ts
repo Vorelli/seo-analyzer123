@@ -1,5 +1,5 @@
+import { finder } from '../finder';
 import type { JSDOM } from 'jsdom';
-import { cssPath } from '.';
 import type { IReport, TRuleFunc } from '../interfaces';
 import { META_DESCRIPTION_LENGTH_RULE } from './config/defaults';
 
@@ -17,9 +17,7 @@ const metaDescriptionRule: TRuleFunc = (
         errorMessage: 'Meta description tag is missing.',
         rule: 'metaDescriptionTagMissing',
         failingValue: '',
-        htmlCssSelector:
-          cssPath(dom.window.document.querySelector('head')) ??
-          cssPath(dom.window.document.rootElement)
+        htmlCssSelector: finder(dom, dom.window.document.head)
       });
     }
     const descriptionTags: NodeListOf<Element> =
@@ -31,7 +29,7 @@ const metaDescriptionRule: TRuleFunc = (
     const max = options?.max || META_DESCRIPTION_LENGTH_RULE.max;
     if (descriptionTags.length > 1) {
       report.push({
-        htmlCssSelector: cssPath(descriptionTags[0].parentElement),
+        htmlCssSelector: finder(dom, dom.window.head),
         errorMessage: 'More than one meta description tag found.',
         failingValue: '',
         rule: 'shouldOnlyHaveOneDescriptionTag'
@@ -43,7 +41,7 @@ const metaDescriptionRule: TRuleFunc = (
     ) {
       report.push({
         rule: 'metaDescriptionLength',
-        htmlCssSelector: cssPath(descriptionTags[0]),
+        htmlCssSelector: finder(dom, descriptionTags[0]),
         failingValue: descriptionContent,
         errorMessage: `The meta description length(${descriptionLength}) should be between ${min} and ${max} characters.`
       });

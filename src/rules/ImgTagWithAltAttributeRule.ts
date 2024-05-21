@@ -1,5 +1,5 @@
+import { finder } from '../finder';
 import type { JSDOM } from 'jsdom';
-import { cssPath } from '.';
 import type { IReport, TRuleFunc } from '../interfaces';
 
 const imgTagWithAltAttributeRule: TRuleFunc = (
@@ -17,7 +17,7 @@ const imgTagWithAltAttributeRule: TRuleFunc = (
           rule: 'imgMissingAltAttribute',
           errorMessage: 'This image tag is missing an alt attribute',
           failingValue: '',
-          htmlCssSelector: cssPath(element)
+          htmlCssSelector: finder(dom, element)
         });
         countAlt++;
       }
@@ -26,7 +26,7 @@ const imgTagWithAltAttributeRule: TRuleFunc = (
           rule: 'imgMissingSrcAttribute',
           errorMessage: 'This image tag is missing a src attribute',
           failingValue: '',
-          htmlCssSelector: cssPath(element)
+          htmlCssSelector: finder(dom, element)
         });
         countSrc++;
       }

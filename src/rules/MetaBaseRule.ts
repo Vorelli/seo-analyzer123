@@ -1,5 +1,5 @@
+import { finder } from '../finder';
 import type { JSDOM } from 'jsdom';
-import { cssPath } from '.';
 import type { IReport, TRuleFunc } from '../interfaces';
 import { META_BASE_RULE } from './config/defaults';
 
@@ -15,27 +15,17 @@ const metaBaseRule: TRuleFunc = (
         dom.window.document.querySelector('head');
       const headMetaElement: HTMLMetaElement | null =
         element?.querySelector(`meta[name="${name}"]`) ?? null;
-      if (!element) {
-        report.push({
-          errorMessage: 'This HTML is missing a <head> tag',
-          htmlCssSelector: cssPath(
-            dom.window.document.querySelector('html') ??
-              dom.window.document.rootElement
-          ),
-          failingValue: '',
-          rule: 'headTagMissingMetaTag'
-        });
-      } else if (!headMetaElement) {
+      if (!headMetaElement) {
         report.push({
           errorMessage: `This HTML is missing a <meta name="${name}"> tag`,
-          htmlCssSelector: cssPath(dom.window.document.querySelector('head')),
+          htmlCssSelector: finder(dom, dom.window.document.head),
           failingValue: '',
           rule: 'headTagMissingMetaTag'
         });
       } else if (!headMetaElement.content) {
         report.push({
           errorMessage: `The content attribute for the <meta name="${name}" content=""> tag is empty`,
-          htmlCssSelector: cssPath(headMetaElement),
+          htmlCssSelector: finder(dom, headMetaElement),
           failingValue: '',
           rule: 'metaTagMissingContentAttribute'
         });

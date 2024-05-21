@@ -1,5 +1,5 @@
+import { finder } from '../finder';
 import type { JSDOM } from 'jsdom';
-import { cssPath } from '.';
 import type { IReport, TRuleFunc } from '../interfaces';
 
 const headingsStructureRule: TRuleFunc = (
@@ -16,12 +16,12 @@ const headingsStructureRule: TRuleFunc = (
         const level = Number.parseInt(heading.tagName.substring(1), 10);
         if (level < previousLevel) {
           report.push({
-            errorMessage: `Incorrect headings structure: ${heading.tagName} follows ${
-              previousLevel ? `H${previousLevel}` : 'no heading'
-            }.`,
+            errorMessage: `Incorrect headings structure: ${
+              heading.tagName
+            } follows ${previousLevel ? `H${previousLevel}` : 'no heading'}.`,
             failingValue: heading.tagName,
             rule: 'incorrect-headings-structure',
-            htmlCssSelector: cssPath(heading)
+            htmlCssSelector: finder(dom, heading)
           });
         }
         previousLevel = level;
