@@ -5,10 +5,12 @@ export interface ISeoAnalyzerOptions {
 }
 
 export interface IReport {
-  errorMessage: string;
-  htmlCssSelector: string;
-  failingValue: string;
+  value: string;
   rule: string;
+  htmlCssSelector: string;
+  weight: number;
+  message: string;
+  status: 'fail' | 'warn' | 'pass';
 }
 
 export interface IResult {

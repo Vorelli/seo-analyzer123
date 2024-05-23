@@ -11,10 +11,21 @@ const ATagWithRelAttributeRule: TRuleFunc = (
     for (const element of elements) {
       if (!element.rel) {
         report.push({
-          errorMessage: 'This <a> tags is missing a rel attribute',
+          message: 'This <a> tags is missing a rel attribute',
           rule: 'tagMissingRelAttribute',
-          failingValue: '',
-          htmlCssSelector: finder(dom, element)
+          value: '',
+          htmlCssSelector: finder(dom, element),
+          status: 'fail',
+          weight: 1
+        });
+      } else {
+        report.push({
+          message: 'This <a> tags has a rel attribute',
+          rule: 'tagMissingRelAttribute',
+          value: element.rel,
+          htmlCssSelector: finder(dom, element),
+          status: 'pass',
+          weight: 1
         });
       }
     }

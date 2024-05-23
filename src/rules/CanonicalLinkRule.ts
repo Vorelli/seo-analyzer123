@@ -16,27 +16,42 @@ const canonicalLinkRule: TRuleFunc = (dom: JSDOM): Promise<IReport[] | []> => {
     const report: IReport[] = [];
     if (!element) {
       report.push({
-        errorMessage:
+        message:
           'This HTML is missing a <link rel="canonical" href="..."> link',
-        failingValue: '',
+        value: '',
         htmlCssSelector: finder(dom, dom.window.document.head),
-        rule: 'headTagMissingCanonicalLink'
+        rule: 'headTagMissingCanonicalLink',
+        weight: 1,
+        status: 'fail'
       });
     } else {
       if (element && !element?.href) {
         report.push({
-          errorMessage: 'The canonical link is missing an href attribute',
-          failingValue: '',
+          message: 'The canonical link is missing an href attribute',
+          value: '',
           htmlCssSelector: finder(dom, element),
-          rule: 'canonicalLinkMissingHrefAttribute'
+          rule: 'canonicalLinkMissingHrefAttribute',
+          status: 'fail',
+          weight: 1
         });
       } else if (element && element.href[element.href.length - 1] !== '/') {
         report.push({
-          errorMessage:
+          message:
             'The href attribute does not have a slash at the end of the link.',
-          failingValue: element.href,
+          value: element.href,
           htmlCssSelector: finder(dom, element),
-          rule: 'canonicalLinkHrefMissingTrailingSlash'
+          rule: 'canonicalLinkHrefMissingTrailingSlash',
+          weight: 1,
+          status: 'fail'
+        });
+      } else {
+        report.push({
+          message: 'The canonical link is valid.',
+          weight: 1,
+          status: 'pass',
+          rule: 'canonicalLinkHrefMissingTrailingSlash',
+          htmlCssSelector: finder(dom, element),
+          value: element.href
         });
       }
     }

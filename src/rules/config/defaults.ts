@@ -21,11 +21,15 @@ export const META_BASE_RULE = {
 };
 
 export const TITLE_LENGTH_RULE = {
+  failMin: 15,
   min: 30,
-  max: 60
+  max: 90,
+  failMax: 100
 };
 
 export const META_DESCRIPTION_LENGTH_RULE = {
+  failMin: 50,
   min: 160,
-  max: 300
+  max: 200,
+  failMax: 300
 };

@@ -18,16 +18,29 @@ const metaSocialRule: TRuleFunc = (
       if (!element) {
         report.push({
           rule,
-          errorMessage: `This HTML is missing a <meta property="${property}"> tag`,
-          failingValue: '',
-          htmlCssSelector: finder(dom, dom.window.document.head)
+          message: `This HTML is missing a <meta property="${property}"> tag`,
+          value: '',
+          htmlCssSelector: finder(dom, dom.window.document.head),
+          status: 'fail',
+          weight: 1
         });
       } else if (!element.content) {
         report.push({
           rule,
-          errorMessage: `The content attribute for the <meta property="${property}" content=""> tag is empty`,
-          failingValue: '',
-          htmlCssSelector: finder(dom, element)
+          message: `The content attribute for the <meta property="${property}" content=""> tag is empty`,
+          value: '',
+          htmlCssSelector: finder(dom, element),
+          weight: 1,
+          status: 'fail'
+        });
+      } else {
+        report.push({
+          rule,
+          message: 'The content attribute for the <meta> tag is present',
+          value: element.content,
+          htmlCssSelector: finder(dom, element),
+          weight: 1,
+          status: 'pass'
         });
       }
     }

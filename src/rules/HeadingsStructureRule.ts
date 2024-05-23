@@ -16,12 +16,14 @@ const headingsStructureRule: TRuleFunc = (
         const level = Number.parseInt(heading.tagName.substring(1), 10);
         if (level < previousLevel) {
           report.push({
-            errorMessage: `Incorrect headings structure: ${
+            message: `Incorrect headings structure: ${
               heading.tagName
             } follows ${previousLevel ? `H${previousLevel}` : 'no heading'}.`,
-            failingValue: heading.tagName,
+            value: heading.tagName,
             rule: 'incorrect-headings-structure',
-            htmlCssSelector: finder(dom, heading)
+            htmlCssSelector: finder(dom, heading),
+            status: 'fail',
+            weight: 1
           });
         }
         previousLevel = level;

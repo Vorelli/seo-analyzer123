@@ -17,17 +17,30 @@ const metaBaseRule: TRuleFunc = (
         element?.querySelector(`meta[name="${name}"]`) ?? null;
       if (!headMetaElement) {
         report.push({
-          errorMessage: `This HTML is missing a <meta name="${name}"> tag`,
+          message: `This HTML is missing a <meta name="${name}"> tag`,
           htmlCssSelector: finder(dom, dom.window.document.head),
-          failingValue: '',
-          rule: 'headTagMissingMetaTag'
+          value: '',
+          rule: 'headTagMissingMetaTag',
+          status: 'fail',
+          weight: 1
         });
       } else if (!headMetaElement.content) {
         report.push({
-          errorMessage: `The content attribute for the <meta name="${name}" content=""> tag is empty`,
+          message: `The content attribute for the <meta name="${name}" content=""> tag is empty`,
           htmlCssSelector: finder(dom, headMetaElement),
-          failingValue: '',
-          rule: 'metaTagMissingContentAttribute'
+          value: '',
+          rule: 'metaTagMissingContentAttribute',
+          weight: 1,
+          status: 'warn'
+        });
+      } else {
+        report.push({
+          message: 'You have a content attribute for the <meta name="${name}">',
+          status: 'pass',
+          weight: 1,
+          rule: 'metaTagMissingContentAttribute',
+          value: headMetaElement.content,
+          htmlCssSelector: finder(dom, headMetaElement)
         });
       }
     }
